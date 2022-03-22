@@ -20,6 +20,9 @@ import java.net.URLEncoder;
  */
 @Service
 public class RoadServiceImpl implements RoadService {
+    static String key="dac759bbca955bfb55c0bcdac3618995";
+    static String carUrl="https://restapi.amap.com/v5/direction/walking?parameters";
+    static String waklUrl=
     @Override
     public Object roadPlan(Object[] roadData) {
         int dataLen = roadData.length;
@@ -34,7 +37,7 @@ public class RoadServiceImpl implements RoadService {
                             httpConnection.setRequestMethod("GET");
                             httpConnection.setDoOutput(true);
                             //传递参数
-                            String input = "&key=" + URLEncoder.encode("dac759bbca955bfb55c0bcdac3618995", "UTF-8");
+                            String input = "&key=" + URLEncoder.encode(key, "UTF-8");
                             String startLocation = "", endLocation = "";
                             startLocation += roadData[i].location;//TODO 获取经纬度
                             endLocation += roadData[j].location;
@@ -51,7 +54,7 @@ public class RoadServiceImpl implements RoadService {
                             }
                             BufferedReader responseBuffer = new BufferedReader(
                                     new InputStreamReader((httpConnection.getInputStream())));
-                            String output;
+                            String output;//输出结果
                             System.out.println("Output from Server:  \n");
                             while ((output = responseBuffer.readLine()) != null) {
                                 System.out.println(output);
