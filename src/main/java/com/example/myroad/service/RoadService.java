@@ -1,7 +1,5 @@
 package com.example.myroad.service;
 
-import com.example.myroad.entity.RoadData;
-import com.example.myroad.valueObject.RoadObject;
 import net.sf.json.JSONObject;
 import org.springframework.stereotype.Service;
 
@@ -15,4 +13,5 @@ import org.springframework.stereotype.Service;
 @Service
 public interface RoadService {
     Object roadPlan(JSONObject roadData);
+    cn.hutool.json.JSONObject test();
 }

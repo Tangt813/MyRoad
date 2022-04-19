@@ -38,4 +38,10 @@ public class RoadController {
 
     }
 
+    @GetMapping("/test")
+    public SaResult test()
+    {
+        return SaResult.code(200).setData(roadService.test());
+    }
+
 }
