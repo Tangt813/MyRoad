@@ -102,7 +102,8 @@ class Route {
                     for (int k = 0; k < point_num; k++) {
                         if (j != point_num - 1)//如果没遍历到最后一个节点
                         {
-                            if (PointTable[i][k] == 0 && k != end_point && now_time[i]>)//如果该节点之前未被走过且不为终点,且在时间范围内
+                            //TODO
+                            if (PointTable[i][k] == 0 && k != end_point && now_time[i]>1)//如果该节点之前未被走过且不为终点,且在时间范围内
                             {
                                 P[k] = Math.pow(Tau[NowAntPoint[i]][k], alpha) * Math.pow(Eta[NowAntPoint[i]][k], beta);
                                 p_sum += P[k];
