@@ -59,7 +59,7 @@ public class RoadServiceImpl implements RoadService {
                         URL restServiceURL = new URL(url);
                         try {
 //                            JsonTest jsonTest = JSONObject.parseObject(json,JsonTest.class);
-
+// TODO @郑启帆修改一下这里
                             HttpsURLConnection httpsURLConnection = (HttpsURLConnection) restServiceURL.openConnection();
                             httpsURLConnection.setRequestMethod("GET");
                             httpsURLConnection.setDoOutput(true);
