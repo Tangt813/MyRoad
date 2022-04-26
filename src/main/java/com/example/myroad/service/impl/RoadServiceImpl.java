@@ -1,7 +1,7 @@
 package com.example.myroad.service.impl;
 
-import com.example.myroad.entity.RoadData;
 import com.example.myroad.service.RoadService;
+import com.example.myroad.utils.HttpsUtil;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.springframework.stereotype.Service;
@@ -26,6 +26,12 @@ public class RoadServiceImpl implements RoadService {
     static String bicycleUrl = "https://restapi.amap.com/v5/direction/bicycling?";
     static String electrobikeUrl = "https://restapi.amap.com/v5/direction/electrobike?";
     static String integratedUrl = "https://restapi.amap.com/v5/direction/transit/integrated?";//公交
+
+
+    @Override
+    public cn.hutool.json.JSONObject test(){
+        return HttpsUtil.getResponse();
+    }
 
     @Override
     public Object roadPlan(JSONObject roadDataList) {
