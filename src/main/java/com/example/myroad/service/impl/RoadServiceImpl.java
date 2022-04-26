@@ -1,13 +1,15 @@
 package com.example.myroad.service.impl;
 
+import cn.hutool.json.JSONArray;
+import cn.hutool.json.JSONObject;
 import com.example.myroad.service.RoadService;
 import com.example.myroad.utils.HttpsUtil;
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
 import org.springframework.stereotype.Service;
-import cn.hutool.json.JSONObject;
-import java.io.*;
-import java.net.*;
+
+import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -30,7 +32,7 @@ public class RoadServiceImpl implements RoadService {
 
 
     @Override
-    public cn.hutool.json.JSONObject test(){
+    public cn.hutool.json.JSONObject test() {
         return HttpsUtil.getResponse();
     }
 
@@ -55,37 +57,41 @@ public class RoadServiceImpl implements RoadService {
                 break;
 
         }
-        JSONArray location= roadDataList.getJSONArray("location");
+        JSONArray location = roadDataList.getJSONArray("location");
         int dataLen = location.size();
 
 
         for (int i = 0; i < dataLen; i++) {
             for (int j = 0; j < dataLen; j++) {
                 if (i != j) {
+
                     try {
                         URL restServiceURL = new URL(url);
-                        try {
+                    } catch (MalformedURLException e) {
+                        e.printStackTrace();
+                    }
+
 //                            JsonTest jsonTest = JSONObject.parseObject(json,JsonTest.class);
 // TODO @郑启帆修改一下这里
 
-                            //设置参数
-                            Map params = new HashMap();
+                    //设置参数
+                    Map params = new HashMap();
 
-                            params.put("origin",location.getString(i));
-                            params.put("destination",location.getString(j));
-
-                            String result=HttpsUtil.httpsRequest(url,params);
-                            cn.hutool.json.JSONObject jsonObject= new JSONObject(result);
-
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        } catch (RuntimeException e) {
-                            e.printStackTrace();
-                        }
-
-                    } catch (IOException e) {
+                    params.put("origin", location.get(i));
+                    params.put("destination", location.get(j));
+//                    input.append("&key=").append(URLEncoder.encode(key, "UTF-8")) ;
+                    try {
+                        params.put("key",URLEncoder.encode(key, "UTF-8"));
+                    } catch (UnsupportedEncodingException e) {
                         e.printStackTrace();
                     }
+
+                    String result = HttpsUtil.httpsRequest(url, params);
+                    System.out.println(result);
+                    cn.hutool.json.JSONObject jsonObject = new JSONObject(result);
+                    System.out.println(jsonObject);
+
+
                 }
 
             }

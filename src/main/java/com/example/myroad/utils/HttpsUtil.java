@@ -6,7 +6,6 @@ import java.util.Map;
 
 
 import java.io.*;
-import java.net.HttpURLConnection;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
@@ -45,7 +44,7 @@ public class HttpsUtil {
         try
         {
             //TODO 封装访问api接口
-            URL url = new URL(requestUrl+"?"+urlencode(params));
+            URL url = new URL(requestUrl+urlencode(params));
             HttpsURLConnection httpsURLConnection=(HttpsURLConnection) url.openConnection();
             httpsURLConnection.setDoOutput(true);
             httpsURLConnection.setRequestMethod("GET");
@@ -85,7 +84,7 @@ public class HttpsUtil {
         //将map里的参数变成像 showapi_appid=###&showapi_sign=###&的样子
         StringBuilder sb = new StringBuilder();
         for (Map.Entry i : data.entrySet()) {
-            sb.append(i.getKey()).append("=").append(URLEncoder.encode(i.getValue()+"", StandardCharsets.UTF_8)).append("&");
+            sb.append("&").append(i.getKey()).append("=").append(URLEncoder.encode(i.getValue()+"", StandardCharsets.UTF_8));
         }
         return sb.toString();
     }
