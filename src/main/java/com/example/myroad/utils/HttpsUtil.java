@@ -74,7 +74,10 @@ public class HttpsUtil {
             System.out.println("fail to connect!");
             return "fail";
         }
-        //返回字符串
+
+
+
+//        //返回字符串
         return buffer.toString();
     }
 

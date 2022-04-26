@@ -5,10 +5,11 @@ import com.example.myroad.utils.HttpsUtil;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.springframework.stereotype.Service;
-
-import javax.net.ssl.HttpsURLConnection;
+import cn.hutool.json.JSONObject;
 import java.io.*;
 import java.net.*;
+import java.util.HashMap;
+import java.util.Map;
 
 
 /**
@@ -66,36 +67,16 @@ public class RoadServiceImpl implements RoadService {
                         try {
 //                            JsonTest jsonTest = JSONObject.parseObject(json,JsonTest.class);
 // TODO @郑启帆修改一下这里
-                            HttpsURLConnection httpsURLConnection = (HttpsURLConnection) restServiceURL.openConnection();
-                            httpsURLConnection.setRequestMethod("GET");
-                            httpsURLConnection.setDoOutput(true);
-                            //传递参数
-                            StringBuilder input = new StringBuilder();
-                                   input.append("&key=").append(URLEncoder.encode(key, "UTF-8")) ;
-                            String startLocation = "", endLocation = "";
-                            startLocation += location.getString(i);//TODO 获取经纬度
-                            endLocation += location.getString(j);
-                            System.out.println(startLocation+"  "+endLocation);
-                            input.append("&origin=" ).append(URLEncoder.encode(startLocation, "UTF-8"));
-                            input.append("&destination=").append(URLEncoder.encode(endLocation, "UTF-8"));
 
-                            OutputStream outputStream = httpsURLConnection.getOutputStream();
-                            outputStream.write(input.toString().getBytes());
-                            outputStream.flush();
+                            //设置参数
+                            Map params = new HashMap();
 
-                            if (httpsURLConnection.getResponseCode() != 200) {
-                                throw new RuntimeException(
-                                        "HTTP GET Request Failed with Error code : "
-                                                + httpsURLConnection.getResponseCode());
-                            }
-                            BufferedReader responseBuffer = new BufferedReader(
-                                    new InputStreamReader((httpsURLConnection.getInputStream())));
-                            String output;//输出结果
-                            System.out.println("Output from Server:  \n");
-                            while ((output = responseBuffer.readLine()) != null) {
-                                System.out.println(output);
-                            }
-                            httpsURLConnection.disconnect();
+                            params.put("origin",location.getString(i));
+                            params.put("destination",location.getString(j));
+
+                            String result=HttpsUtil.httpsRequest(url,params);
+                            cn.hutool.json.JSONObject jsonObject= new JSONObject(result);
+
                         } catch (IOException e) {
                             e.printStackTrace();
                         } catch (RuntimeException e) {
