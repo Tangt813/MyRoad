@@ -9,6 +9,8 @@ import java.io.*;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
+
+import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
 
 /**
@@ -22,19 +24,23 @@ public class HttpsUtil {
 
     public static JSONObject getResponse() {
         //接口地址
-        String requestUrl = "https://restapi.amap.com/v3/place/text";
+        String requestUrl = "https://restapi.amap.com/v5/direction/driving?key=dac759bbca955bfb55c0bcdac3618995&origin=116.481028,39.989643&destination=116.434446,39.90816&show_fields=cost";
         //params用于存储要请求的参数
         Map params = new HashMap();
-
-        params.put("key","af4d996c3d370dc138d60ee80a281a3e");
-
-        params.put("types","010101");
+//
+//        params.put("key","af4d996c3d370dc138d60ee80a281a3e");
+//
+//        params.put("types","010101");
         //调用httpRequest方法，这个方法主要用于请求地址，并加上请求参数
         String string = httpsRequest(requestUrl,params);
 
         //处理返回的JSON数据并返回
         //直接返回json数据，返回后再进行处理
         JSONObject jsonObject = new JSONObject(string);
+        System.out.println(jsonObject);
+        JSONArray paths= (JSONArray) ((Map) jsonObject.get("route")).get("paths");
+        System.out.println(jsonObject.get("route"));
+        System.out.println(Double.parseDouble(((Map)((Map)paths.get(0)).get("cost")).get("duration").toString()));
         return jsonObject;
     }
 

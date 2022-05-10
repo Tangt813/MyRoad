@@ -24,11 +24,11 @@ import java.util.Map;
 @Service
 public class RoadServiceImpl implements RoadService {
     static String key = "dac759bbca955bfb55c0bcdac3618995";
-    static String carUrl = "https://restapi.amap.com/v3/direction/driving?strategy=0";//?parameters
-    static String walkUrl = "https://restapi.amap.com/v5/direction/walking?";
-    static String bicycleUrl = "https://restapi.amap.com/v5/direction/bicycling?";
-    static String electrobikeUrl = "https://restapi.amap.com/v5/direction/electrobike?";
-    static String integratedUrl = "https://restapi.amap.com/v5/direction/transit/integrated?";//公交
+    static String carUrl = "https://restapi.amap.com/v3/direction/driving?strategy=0&show_fields=cost";//?parameters
+    static String walkUrl = "https://restapi.amap.com/v5/direction/walking?show_fields=cost";
+    static String bicycleUrl = "https://restapi.amap.com/v5/direction/bicycling?show_fields=cost";
+    static String electrobikeUrl = "https://restapi.amap.com/v5/direction/electrobike?show_fields=cost";
+    static String integratedUrl = "https://restapi.amap.com/v5/direction/transit/integrated?show_fields=cost";//公交
 
 
     @Override
@@ -59,19 +59,12 @@ public class RoadServiceImpl implements RoadService {
         }
         JSONArray location = roadDataList.getJSONArray("location");
         int dataLen = location.size();
+        double[][]needTime=new double[dataLen][dataLen];
 
 
         for (int i = 0; i < dataLen; i++) {
             for (int j = 0; j < dataLen; j++) {
                 if (i != j) {
-
-                    try {
-                        URL restServiceURL = new URL(url);
-                    } catch (MalformedURLException e) {
-                        e.printStackTrace();
-                    }
-
-//                            JsonTest jsonTest = JSONObject.parseObject(json,JsonTest.class);
 // TODO @郑启帆修改一下这里
 
                     //设置参数
@@ -91,11 +84,24 @@ public class RoadServiceImpl implements RoadService {
                     cn.hutool.json.JSONObject jsonObject = new JSONObject(result);
                     System.out.println(jsonObject);
 
+                    //提取出时间
+                    JSONArray paths= (JSONArray) ((Map) jsonObject.get("route")).get("paths");
+                    double min=Double.MAX_VALUE;
+                    for (int k = 0; k < paths.size(); k++) {
+                        double val=Double.parseDouble(((Map)((Map)paths.get(i)).get("cost")).get("duration").toString());
+                        if(val<min)
+                        {
+                            min=val;
+                        }
+                    }
+                    needTime[i][j]=min;
+
 
                 }
 
             }
         }
+
         return null;
     }
 }
