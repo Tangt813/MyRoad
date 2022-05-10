@@ -3,9 +3,11 @@ package com.example.myroad.service.impl;
 import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
 import com.example.myroad.service.RoadService;
+import com.example.myroad.utils.Algorithm.MyRoute;
 import com.example.myroad.utils.HttpsUtil;
 import org.springframework.stereotype.Service;
-
+import org.springframework.util.RouteMatcher;
+import com.example.myroad.utils.*;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -62,6 +64,7 @@ public class RoadServiceImpl implements RoadService {
         double[][]needTime=new double[dataLen][dataLen];
 
 
+
         for (int i = 0; i < dataLen; i++) {
             for (int j = 0; j < dataLen; j++) {
                 if (i != j) {
@@ -101,7 +104,35 @@ public class RoadServiceImpl implements RoadService {
 
             }
         }
+        String str1=roadDataList.getStr("timeSpan");
+        String str2=str1.substring(1);
+        String []timeSpanStr=str2.substring(0,str2.length()-1).split(",");
 
+
+        double[][] timeSpan=new double[dataLen][2];
+        for (int i = 0; i < dataLen*2; i++) {
+            if(i<dataLen)
+            {
+                timeSpan[i][0]=Double.parseDouble(timeSpanStr[i]);
+            }
+            else
+            {
+                timeSpan[i%dataLen][1]=Double.parseDouble(timeSpanStr[i]);
+            }
+        }
+
+        str1=roadDataList.getStr("sequence");
+        str2=str1.substring(1);
+        String []seqStr=str2.substring(0,str2.length()-1).split(",");
+        int[]seqence=new int[dataLen];
+        for (int i = 0; i < dataLen; i++) {
+            seqence[i]=Integer.parseInt(seqStr[i]);
+        }
+
+        MyRoute myRoute=new MyRoute(dataLen,needTime,timeSpan,seqence,roadDataList.getInt("startPoint"),roadDataList.getInt("endPoint"));
+        myRoute.carculate();
+
+        //TODO：计算出myroute之后，根据前端要求返回数据
         return null;
     }
 }

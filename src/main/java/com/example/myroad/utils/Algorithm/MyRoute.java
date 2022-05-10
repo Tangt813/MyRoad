@@ -1,26 +1,15 @@
-package com.example.myroad.utils;
+package com.example.myroad.utils.Algorithm;
 
-
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-import java.util.*;
+import java.util.Arrays;
 
 /**
- * @ClassName: MyRouteController
- * @Description: 代码测试
- * @Author: Shadon
- * @Date: 2022/3/15 15:34
+ * @ClassName: MyRoute
+ * @Description: TODO
+ * @Author: Tangt
+ * @Date: 2022/5/10 13:38
  * @Version: v1.0
  */
-class MinPos {
-    double min_Length;//记录最小的距离
-    int min_index;//记录最小距离的下标
-}
-
-class Route {
+public class MyRoute {
     private int point_num;
     private double[][] map;
     private double[][] time;
@@ -30,7 +19,7 @@ class Route {
     private double route_length;
     private int[] shortest_route;
 
-    public Route(int point_num, double[][] map, double[][] time, int[] sequence, int start_point, int end_point) {
+    public MyRoute(int point_num, double[][] map, double[][] time, int[] sequence, int start_point, int end_point) {
         this.point_num = point_num;
         this.map = map;
         this.time = time;
@@ -214,43 +203,5 @@ class Route {
 
     public int[] getShortest_route() {
         return shortest_route;
-    }
-}
-
-public class Algorithm {
-    public static void main(String[] args) {
-//        假设有6个点
-        int point_num = 6;
-//        初始化地图
-        double[][] map = new double[6][6];
-        for (int i = 0; i < point_num; i++) {
-            for (int j = i + 1; j < point_num; j++) {
-                map[i][j] = Math.random() * 10;
-                map[j][i] = map[i][j];
-            }
-            map[i][i] = 0;
-        }
-//        无时间限制
-        double[][] time = new double[6][2];
-        for (int i = 0; i < point_num; i++) {
-            time[i][0] = -1;
-            time[i][1] = -1;
-        }
-//        无绝对位置限制
-        int[] sequence = new int[6];
-        for (int i = 0; i < point_num; i++) {
-            sequence[i] = -1;
-        }
-//        起点为0
-        int start_point = 0;
-//        终点为最后一个点
-        int end_point = 5;
-        Route my_route = new Route(point_num, map, time, sequence, start_point, end_point);
-        my_route.carculate();
-        System.out.println(my_route.getRoute_length());
-        int[] route = my_route.getShortest_route();
-        for (int i = 0; i < route.length; i++) {
-            System.out.println(route[i]);
-        }
     }
 }
