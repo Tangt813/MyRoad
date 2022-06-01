@@ -40,6 +40,7 @@ public class RoadServiceImpl implements RoadService {
 
     @Override
     public Object roadPlan(JSONObject roadDataList) {
+        System.out.println(roadDataList.get("timeSpan"));
         String url = carUrl;//驾车规划
         switch (roadDataList.getInt("wayType")) {
             case 0:
@@ -91,7 +92,7 @@ public class RoadServiceImpl implements RoadService {
                     JSONArray paths= (JSONArray) ((Map) jsonObject.get("route")).get("paths");
                     double min=Double.MAX_VALUE;
                     for (int k = 0; k < paths.size(); k++) {
-                        double val=Double.parseDouble(((Map)((Map)paths.get(i)).get("cost")).get("duration").toString());
+                        double val=Double.parseDouble(((Map)paths.get(k)).get("duration").toString());
                         if(val<min)
                         {
                             min=val;

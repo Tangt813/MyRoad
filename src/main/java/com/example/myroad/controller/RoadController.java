@@ -29,7 +29,7 @@ public class RoadController {
         this.roadService = new RoadServiceImpl();
     }
 
-    @GetMapping("/roadPlan")
+    @PostMapping("/roadPlan")
     public SaResult roadPlan(@RequestBody JSONObject pointData)//TODO 更多用户选择
             //wayType:0-->驾车，1-->步行，2-->骑行，3-->公交
     {
