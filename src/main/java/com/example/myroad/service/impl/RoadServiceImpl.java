@@ -12,8 +12,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 
 /**
@@ -76,7 +75,6 @@ public class RoadServiceImpl implements RoadService {
 
                     params.put("origin", location.get(i));
                     params.put("destination", location.get(j));
-//                    input.append("&key=").append(URLEncoder.encode(key, "UTF-8")) ;
                     try {
                         params.put("key",URLEncoder.encode(key, "UTF-8"));
                     } catch (UnsupportedEncodingException e) {
@@ -91,16 +89,17 @@ public class RoadServiceImpl implements RoadService {
                     //提取出时间
                     JSONArray paths= (JSONArray) ((Map) jsonObject.get("route")).get("paths");
                     double min=Double.MAX_VALUE;
+                    Map tempMap=new HashMap();
                     for (int k = 0; k < paths.size(); k++) {
                         double val=Double.parseDouble(((Map)paths.get(k)).get("duration").toString());
                         if(val<min)
                         {
                             min=val;
+                            tempMap=(Map) paths.get(k);
                         }
                     }
                     needTime[i][j]=min;
-
-
+                    route[i][j]=tempMap;
                 }
             }
         }
@@ -131,8 +130,18 @@ public class RoadServiceImpl implements RoadService {
 
         MyRoute myRoute=new MyRoute(dataLen,needTime,timeSpan,seqence,roadDataList.getInt("startPoint"),roadDataList.getInt("endPoint"));
         myRoute.carculate();
+        int[] resRoute=myRoute.getShortest_route();
+        List<String>polyline=new ArrayList<>();
+        for (int i = 0; i < resRoute.length-1; i++) {
+            JSONArray steps= (JSONArray) route[resRoute[i]][resRoute[i+1]].get("steps");
 
-        //TODO：计算出myroute之后，根据前端要求返回数据
-        return null;
+            for (int j = 0; j < steps.size(); j++) {
+                JSONObject jsonObject = steps.getJSONObject(j);
+                String[] step=((String) jsonObject.get("polyline")).split(";");
+//                System.out.println(step);
+                polyline.addAll(List.of(step));
+            }
+        }
+        return polyline;
     }
 }
