@@ -65,7 +65,7 @@ public class RoadServiceImpl implements RoadService {
         double[][]needTime=new double[dataLen][dataLen];
 
 
-
+        Map[][]route=new Map[dataLen][dataLen];
         for (int i = 0; i < dataLen; i++) {
             for (int j = 0; j < dataLen; j++) {
                 if (i != j) {
@@ -102,7 +102,6 @@ public class RoadServiceImpl implements RoadService {
 
 
                 }
-
             }
         }
         String str1=roadDataList.getStr("timeSpan");
