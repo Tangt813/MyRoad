@@ -39,7 +39,7 @@ public class RoadServiceImpl implements RoadService {
 
     @Override
     public Object roadPlan(JSONObject roadDataList) {
-        System.out.println(roadDataList.get("timeSpan"));
+//        System.out.println(roadDataList.get("timeSpan"));
         String url = carUrl;//驾车规划
         switch (roadDataList.getInt("wayType")) {
             case 0:
@@ -82,9 +82,9 @@ public class RoadServiceImpl implements RoadService {
                     }
 
                     String result = HttpsUtil.httpsRequest(url, params);
-                    System.out.println(result);
+//                    System.out.println(result);
                     cn.hutool.json.JSONObject jsonObject = new JSONObject(result);
-                    System.out.println(jsonObject);
+//                    System.out.println(jsonObject);
 
                     //提取出时间
                     JSONArray paths= (JSONArray) ((Map) jsonObject.get("route")).get("paths");
@@ -112,11 +112,13 @@ public class RoadServiceImpl implements RoadService {
         for (int i = 0; i < dataLen*2; i++) {
             if(i<dataLen)
             {
-                timeSpan[i][0]=Double.parseDouble(timeSpanStr[i]);
+                double timeTemp=Double.parseDouble(timeSpanStr[i]);
+                timeSpan[i][0]=timeTemp<0?0:timeTemp;
             }
             else
             {
-                timeSpan[i%dataLen][1]=Double.parseDouble(timeSpanStr[i]);
+                double timeTemp=Double.parseDouble(timeSpanStr[i]);
+                timeSpan[i%dataLen][1]=timeTemp<0?100000d:timeTemp;
             }
         }
 
@@ -131,6 +133,8 @@ public class RoadServiceImpl implements RoadService {
         MyRoute myRoute=new MyRoute(dataLen,needTime,timeSpan,seqence,roadDataList.getInt("startPoint"),roadDataList.getInt("endPoint"));
         myRoute.carculate();
         int[] resRoute=myRoute.getShortest_route();
+        if(resRoute[0]==-1)
+            return null;
         List<String>polyline=new ArrayList<>();
         for (int i = 0; i < resRoute.length-1; i++) {
             JSONArray steps= (JSONArray) route[resRoute[i]][resRoute[i+1]].get("steps");
