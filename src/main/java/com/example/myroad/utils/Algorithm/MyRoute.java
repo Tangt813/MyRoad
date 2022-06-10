@@ -43,7 +43,7 @@ public class MyRoute {
         for (int i = 0; i < point_num; i++) {
             for (int j = 0; j < point_num; j++) {
                 if(map[i][j]!=0)
-                    Eta[i][j] = 1 / Double.valueOf(map[i][j]);
+                    Eta[i][j] = 1 / map[i][j];
                 else
                     Eta[i][j]=1;
             }
@@ -62,13 +62,12 @@ public class MyRoute {
         int[] Route_best = new int[point_num];//当前最佳路径
         Arrays.fill(Route_best, 0);
 
-        int initial_route=1000;
+        double initial_route=1000000000;
         double Length_best = initial_route;//最佳路径的长度 初始值为一个很大的值
 
-        int[]now_time=new int[ant_num];//蚂蚁的当前时间
+        double[]now_time=new double[ant_num];//蚂蚁的当前时间
         int[]finished=new int[ant_num];//蚂蚁是否走完了路径
         Arrays.fill(finished, 1);//最初假设都走完了
-
         Arrays.fill(now_time, 0);
 
         //迭代寻找最佳路径
@@ -175,10 +174,6 @@ public class MyRoute {
             for (int i = 0; i < ant_num; i++) {
                 if(finished[i]==0)
                     ;
-                    //逐个节点计算
-//                    for (int j = 0; j < point_num - 1; j++) {
-//                        Delta_Tau[j][Table[i][j]][Table[i][j + 1]] = Delta_Tau[j][Table[i][j]][Table[i][j + 1]] - Q / Length[i];
-//                    }
                 else {
                     //逐个节点计算
                     for (int j = 0; j < point_num - 1; j++) {
