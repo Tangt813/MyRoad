@@ -28,31 +28,32 @@ public class MyRoute {
         this.end_point = end_point;
 
         shortest_route=new int[point_num];
+        Arrays.fill(shortest_route,-1);
     }
 
     public void carculate() {
-        for (int i = 0; i < this.point_num; i++) {
-            for (int j = 0; j < this.point_num; j++) {
-                System.out.println(map[i][j]);
-            }
-        }
 //        初始化参数
         int ant_num = 100 / point_num;//蚂蚁数量 节点数越多，蚂蚁数量应该越小，减少系统崩溃
-        double alpha = 1;//信息素重要程度因子
-        double beta = 5;//启发函数重要程度因子
+        double alpha = 2;//信息素重要程度因子
+        double beta = 0.2;//启发函数重要程度因子
         double rho = 0.1;//信息素挥发因子
         double Q = 1;//常系数
         //启发函数
         double[][] Eta = new double[point_num][point_num];
         for (int i = 0; i < point_num; i++) {
             for (int j = 0; j < point_num; j++) {
-                Eta[i][j] = 1 / map[i][j];
+                if(map[i][j]!=0)
+                    Eta[i][j] = 1 / Double.valueOf(map[i][j]);
+                else
+                    Eta[i][j]=1;
             }
         }
         //信息素矩阵,初始值为1
-        double[][] Tau = new double[point_num][point_num];
-        for (int i = 0; i < point_num; i++)
-            Arrays.fill(Tau[i], 1);
+        double[][][] Tau = new double[point_num-1][point_num][point_num];
+        for (int i = 0; i < point_num-1; i++)
+            for (int j = 0; j < point_num; j++) {
+                Arrays.fill(Tau[i][j], 1);
+            }
         //当前各个蚂蚁所处的节点
         int[] NowAntPoint = new int[ant_num];
         //迭代次数
@@ -60,9 +61,14 @@ public class MyRoute {
         int iter = 0;//迭代次数初值
         int[] Route_best = new int[point_num];//当前最佳路径
         Arrays.fill(Route_best, 0);
-        double Length_best = 1000000000;//最佳路径的长度 初始值为一个很大的值
 
-        int[]now_time=new int[ant_num];
+        int initial_route=1000;
+        double Length_best = initial_route;//最佳路径的长度 初始值为一个很大的值
+
+        int[]now_time=new int[ant_num];//蚂蚁的当前时间
+        int[]finished=new int[ant_num];//蚂蚁是否走完了路径
+        Arrays.fill(finished, 1);//最初假设都走完了
+
         Arrays.fill(now_time, 0);
 
         //迭代寻找最佳路径
@@ -83,22 +89,21 @@ public class MyRoute {
                 PointTable[i][start_point] = 1;//起点已经被走过了
             }
             //逐个蚂蚁路径选择
-            for (int i = 0; i < ant_num; i++) {//逐个城市路径选择
+            for (int i = 0; i < ant_num; i++) {//逐个路径选择
                 for (int j = 1; j < point_num; j++) {
                     double[] P = new double[point_num];//节点之间的转移概率
                     double p_sum = 0;//记录概率的总和,方便归一化
                     //计算节点之间的转移概率
-                    for (int k = 0; k < point_num; k++) {
+                    for (int k = 1; k < point_num; k++) {
                         if (j != point_num - 1)//如果没遍历到最后一个节点
                         {
-                            //TODO
-                            if (PointTable[i][k] == 0 && k != end_point && now_time[i]>1)//如果该节点之前未被走过且不为终点,且在时间范围内
+                            if (PointTable[i][k] == 0 && k != end_point && now_time[i]+map[NowAntPoint[i]][k]>=time[k][0]&&now_time[i]+map[NowAntPoint[i]][k]<=time[k][1] && (sequence[k] == -1 || sequence[k] == j) )//如果该节点之前未被走过且不为终点,且在时间范围内.若有顺序,则要保证与顺序一致
                             {
-                                P[k] = Math.pow(Tau[NowAntPoint[i]][k], alpha) * Math.pow(Eta[NowAntPoint[i]][k], beta);
+                                P[k] = Math.pow(Tau[j-1][NowAntPoint[i]][k], alpha) + Math.pow(Eta[NowAntPoint[i]][k], beta);
                                 p_sum += P[k];
                             } else
                                 P[k] = 0;
-                        } else//如果遍历到最后一个节点
+                        } else
                         {
                             P[k] = 0;//节点的概率都为负数，防止出bug
                         }
@@ -106,6 +111,10 @@ public class MyRoute {
                     if (j == point_num - 1) {
                         P[end_point] = 1;//除了终点概率都为0
                         p_sum = 1;
+                    }
+                    if(p_sum==0){//如果总的概率为0，即还未到终点，但已经没有可以去的下一个节点了（受时间范围影响）
+                        finished[i]=0;
+                        break;
                     }
                     for (int k = 0; k < point_num; k++) {
                         P[k] = P[k] / p_sum;
@@ -120,6 +129,7 @@ public class MyRoute {
                             Table[i][j] = k;
                             PointTable[i][k] = 1;
                             NowAntPoint[i] = k;
+                            now_time[i]+=map[Table[i][j-1]][Table[i][j]];
                             break;
                         }
                     }
@@ -129,6 +139,10 @@ public class MyRoute {
             double[] Length = new double[ant_num];
             Arrays.fill(Length, 0);
             for (int i = 0; i < ant_num; i++) {
+                if(finished[i]==0) {
+                    Length[i] = initial_route;//一个特别大的数字
+                    continue;
+                }
                 for (int j = 0; j < point_num - 1; j++) {
                     Length[i] += map[Table[i][j]][Table[i][j + 1]];
                 }
@@ -152,39 +166,43 @@ public class MyRoute {
                 }
             }
             //更新信息素
-            double[][] Delta_Tau = new double[point_num][point_num];
-            for(int i=0;i<point_num;i++)
-                Arrays.fill(Delta_Tau[i], 0);
+            double[][][] Delta_Tau = new double[point_num-1][point_num][point_num];
+            for(int i=0;i<point_num-1;i++)
+                for (int j = 0; j < point_num; j++) {
+                    Arrays.fill(Delta_Tau[i][j], 0);
+                }
             //逐个蚂蚁计算
             for (int i = 0; i < ant_num; i++) {
-                //逐个节点计算
-                for (int j = 0; j < point_num - 1; j++) {
-                    Delta_Tau[Table[i][j]][Table[i][j + 1]] = Delta_Tau[Table[i][j]][Table[i][j + 1]] + Q / Length[i];
+                if(finished[i]==0)
+                    ;
+                    //逐个节点计算
+//                    for (int j = 0; j < point_num - 1; j++) {
+//                        Delta_Tau[j][Table[i][j]][Table[i][j + 1]] = Delta_Tau[j][Table[i][j]][Table[i][j + 1]] - Q / Length[i];
+//                    }
+                else {
+                    //逐个节点计算
+                    for (int j = 0; j < point_num - 1; j++) {
+                        Delta_Tau[j][Table[i][j]][Table[i][j + 1]] = Delta_Tau[j][Table[i][j]][Table[i][j + 1]] + Q / Length[i];
+                    }
                 }
             }
-            for (int i = 0; i < point_num; i++) {
-                //逐个节点计算
+            for(int i=0;i<point_num-1;i++)
                 for (int j = 0; j < point_num; j++) {
-                    Tau[i][j] = (1 - rho) * Tau[i][j] + Delta_Tau[i][j];
+                    //逐个节点计算
+                    for (int k = 0; k < point_num; k++) {
+                        Tau[i][j][k] = (1 - rho) * Tau[i][j][k] + Delta_Tau[i][j][k];
+                    }
                 }
-            }
-
-//            System.out.println(Length_best);
-//            for (int i = 0; i < point_num; i++) {
-//                System.out.println(Route_best[i]);
-//            }
             iter+=1;//迭代次数加1
         }
         route_length=Length_best;
-        System.out.println(route_length);
+
+        if(Length_best == initial_route)
+            return;
         for (int i = 0; i < point_num; i++) {
             shortest_route[i]=Route_best[i];
         }
-        for (int i = 0; i < point_num; i++) {
-            System.out.println(shortest_route[i]);
-        }
     }
-
     //找到所有蚂蚁中路径最短的路径长度，并得到对应索引
     private void Double_Min(double[] Length, int ant_num, MinPos minPos) {
         minPos.min_Length = Length[0];
