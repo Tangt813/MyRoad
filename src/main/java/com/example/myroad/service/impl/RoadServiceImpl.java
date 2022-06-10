@@ -25,11 +25,9 @@ import java.util.*;
 @Service
 public class RoadServiceImpl implements RoadService {
     static String key = "dac759bbca955bfb55c0bcdac3618995";
-    static String carUrl = "https://restapi.amap.com/v3/direction/driving?strategy=0&show_fields=cost";//?parameters
-    static String walkUrl = "https://restapi.amap.com/v5/direction/walking?show_fields=cost";
-    static String bicycleUrl = "https://restapi.amap.com/v5/direction/bicycling?show_fields=cost";
-    static String electrobikeUrl = "https://restapi.amap.com/v5/direction/electrobike?show_fields=cost";
-    static String integratedUrl = "https://restapi.amap.com/v5/direction/transit/integrated?show_fields=cost";//公交
+    static String carUrl = "https://restapi.amap.com/v3/direction/driving?strategy=0&show_fields=cost,polyline";//?parameters
+    static String walkUrl = "https://restapi.amap.com/v3/direction/walking?show_fields=cost,polyline";
+    static String bicycleUrl = "https://restapi.amap.com/v5/direction/bicycling?show_fields=cost,polyline";
 
 
     @Override
@@ -39,7 +37,6 @@ public class RoadServiceImpl implements RoadService {
 
     @Override
     public Object roadPlan(JSONObject roadDataList) {
-//        System.out.println(roadDataList.get("timeSpan"));
         String url = carUrl;//驾车规划
         switch (roadDataList.getInt("wayType")) {
             case 0:
@@ -51,13 +48,6 @@ public class RoadServiceImpl implements RoadService {
             case 2:
                 url = bicycleUrl;
                 break;
-            case 3:
-                url = electrobikeUrl;
-                break;
-            case 4:
-                url = integratedUrl;
-                break;
-
         }
         JSONArray location = roadDataList.getJSONArray("location");
         int dataLen = location.size();
@@ -82,16 +72,15 @@ public class RoadServiceImpl implements RoadService {
                     }
 
                     String result = HttpsUtil.httpsRequest(url, params);
-//                    System.out.println(result);
                     cn.hutool.json.JSONObject jsonObject = new JSONObject(result);
-//                    System.out.println(jsonObject);
 
                     //提取出时间
-                    JSONArray paths= (JSONArray) ((Map) jsonObject.get("route")).get("paths");
+                    JSONArray paths= (JSONArray) ((Map) (jsonObject.get("route"))).get("paths");
                     double min=Double.MAX_VALUE;
                     Map tempMap=new HashMap();
                     for (int k = 0; k < paths.size(); k++) {
                         double val=Double.parseDouble(((Map)paths.get(k)).get("duration").toString());
+//                        double val=Double.parseDouble(((Map)((Map)paths.get(k)).get("cost")).get("duration").toString());
                         if(val<min)
                         {
                             min=val;
@@ -133,6 +122,7 @@ public class RoadServiceImpl implements RoadService {
         MyRoute myRoute=new MyRoute(dataLen,needTime,timeSpan,seqence,roadDataList.getInt("startPoint"),roadDataList.getInt("endPoint"));
         myRoute.carculate();
         int[] resRoute=myRoute.getShortest_route();
+
         if(resRoute[0]==-1)
             return null;
         List<String>polyline=new ArrayList<>();
